@@ -1,11 +1,18 @@
 import tkinter as tk
 import turtle
+from numpy.random import seed
+import random
+from os import system
+
+
+
 
 rules = [
     'F[+F]F[-F]F',
     'F[+F]F',
     'F[-F]F',
-    'F[+F]F[-F][F]'
+    'F[+F]F[-F][F]',
+    'F[+F[-F]][-F]'
 ]
 
 # Aqui se guardan los parametros de posicion y angulo
@@ -37,7 +44,8 @@ def processString(ruleList, oldString):
 def applyRule(ruleList, symbol):
     newString = ''
     if symbol == 'F':
-        newString = ruleList[3]
+        value = random.randint(0,4)
+        newString = ruleList[value]
     else:
         newString = symbol
     return newString
@@ -61,28 +69,26 @@ def drawLSystem(turt, lSystem, angle, distance):
             turt.goto(lastPosition)
             turt.pendown()
 
-
-
 def main():
     axiom = 'F'
-    angle = 20
-    iterations = 5
-    distance = 5
+    angle = 25
+    iterations = 7
+    distance = 2
     
     window.tracer(0)
-    
+    turt.clear()
     turt.up()
-    turt.goto(0,-150)
+    turt.goto(0,-250)
     turt.setheading(90)
     turt.down()
     turt.speed('fastest')
 
     inst = createLSystem(rules, axiom, iterations)
-    print(inst, "\n", '='*50)
+    system('cls')
+    # print(inst)
     drawLSystem(turt, inst, angle, distance)
     turt.hideturtle()
     window.update()
-
 
 root = tk.Tk()
 root.geometry('500x675')
