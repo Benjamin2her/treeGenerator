@@ -74,11 +74,17 @@ rules = [
     ('F','F[+F[-F]][-F]')
 ]
 
+# rules = [
+#     ('X', 'F[+X][-X]FX'),
+#     ('F', 'FF')
+# ]
+
 def main():
    
     
     window.tracer(0)
     turt.clear()
+    turt.width(width.get())
     turt.up()
     turt.goto(0,-250)
     turt.setheading(90)
@@ -125,10 +131,17 @@ dist = tk.Scale(root, from_=1, to=10, orient=HORIZONTAL)
 dist.grid(row = 3, column= 9)
 dist.set(5)
 
+lblwidth = tk.Label(root, text = "Grosor")
+lblwidth.grid(row = 4, column = 9)
+
+width = tk.Scale(root, from_=1, to=5, orient=HORIZONTAL)
+width.grid(row = 5, column= 9)
+width.set(1)
+
 lblangle = tk.Label(root, text = "Ángulo")
-lblangle.grid(row = 4, column = 9)
+lblangle.grid(row = 6, column = 9)
 angle = tk.Scale(root, from_=-90, to=90, orient=HORIZONTAL)
-angle.grid(row = 5, column= 9)
+angle.grid(row = 7, column= 9)
 
 window = turtle.TurtleScreen(canvas)
 window.bgcolor('black')
