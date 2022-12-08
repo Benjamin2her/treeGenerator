@@ -1,9 +1,50 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import random
-import tkinter as tk
-from tkinter import HORIZONTAL, colorchooser
+
+from tkinter import Tk, Canvas, Button, Scale, colorchooser, HORIZONTAL, FLAT
 import turtle
+import random
+
+# Boton personalizado
+class Boton(Button):
+    def __init__(self, row, column, *args, **kwargs):
+        Button.__init__(self, *args, **kwargs)
+        self.config(
+            background = '#282a36',
+            foreground = '#f8f8f2',
+            activeforeground= '#282a36',
+            activebackground = '#50fa7b',
+            border = '2px', 
+            padx = 15, pady = 5, 
+            font = ('monaco', 12),
+            width = 12,
+            height = 1,
+            cursor = 'hand1',
+            relief = FLAT
+        )
+        self.grid(row = row, column = column, columnspan = 1, rowspan = 1)
+
+# Barra Escaladora personalizada
+class Escaladora(Scale):
+    def __init__(self, row, column, default, *args, **kwargs):
+        Scale.__init__(self, *args, **kwargs)
+        self.config(
+            background = '#282a36',
+            foreground = '#f8f8f2',
+            activebackground= '#6272a4',
+            troughcolor = '#50fa7b',
+            length = 150,
+            width = 13,
+            sliderlength = 30,
+            font = ('monaco', 10),
+            orient = HORIZONTAL,
+            relief = FLAT,
+            repeatdelay = 100
+        )
+        self.grid(row = row, column = column, columnspan = 1, rowspan = 1)
+        self.set(default)
+
+# Sistema L que representa al arbol
 class lSystem():
     def __init__(self, rules, axiom, iterations):
         self.rules = rules
@@ -11,22 +52,15 @@ class lSystem():
         self.iterations = iterations
         self.cadenaGenerada = [axiom]
         self.turtleValuesStack = []
-    def prin(self):
-        for i in rules:
-            print(i[0], "->", i[1])
-    
-    def createLSystem(self):
+
         startString = self.axiom
         endString = ''
         for _ in range(self.iterations):
             endString = self.processString(startString)
             startString = endString
             self.cadenaGenerada.append(endString)
-        # self.cadenaGenerada = endString
-        
-    '''
-        Reemplaza la cadena anterior por la generada
-    '''
+
+    # Reemplaza la cadena anterior por la generada
     def processString(self, oldString):
         newString = ''
         for symbol in oldString:
@@ -41,9 +75,6 @@ class lSystem():
         else:
             newString = symbol
         return newString
-
-    def cadena(self):
-        print(self.cadenaGenerada)
 
     def drawLSystem(self, turt, angle, distance):
         for symbol in self.cadenaGenerada[self.iterations]:
@@ -63,9 +94,8 @@ class lSystem():
                 turt.penup()
                 turt.goto(lastPosition)
                 turt.pendown()
-
-    
-                
+            
+# Reglas
 rules = [
     ('F','F[+F]F[-F]F'),
     ('F','F[+F]F'),
@@ -74,77 +104,63 @@ rules = [
     ('F','F[+F[-F]][-F]')
 ]
 
-# rules = [
-#     ('X', 'F[+X][-X]FX'),
-#     ('F', 'FF')
-# ]
 
-def main():
-   
-    
+# genera y dibuja el lsystem
+def generate():
+    inst = lSystem(rules, 'F', escIteraciones.get())
     window.tracer(0)
     turt.clear()
-    turt.width(width.get())
+    turt.width(escGrosor.get())
     turt.up()
-    turt.goto(0,-250)
+    turt.goto(0,-300)
     turt.setheading(90)
     turt.down()
-    turt.speed('fastest')
-
-    inst = lSystem(rules, 'F', numIteraciones.get())
-    inst.createLSystem()
-    # system('cls')
-    # print(inst)
-    inst.drawLSystem(turt, angle.get(), dist.get())
-    turt.hideturtle()
+    inst.drawLSystem(turt, escAngulo.get(), escDistancia.get())
     window.update()
 
 
-def fondo():
+def cambiarColorFondo():
     color_selec = colorchooser.askcolor()
-    window.bgcolor(color_selec[1])
-def lapiz():
+    try:
+        window.bgcolor(color_selec[1])
+    except:
+        pass
+
+def cambiarColorTortuga():
     color_selec = colorchooser.askcolor()
-    turt.color(color_selec[1])
+    try:
+        turt.color(color_selec[1])
+    except:
+        pass
 
-root = tk.Tk()
-root.geometry('700x675')
-canvas = tk.Canvas(root, width = 400, height = 650)
-canvas.grid(row = 0, columnspan = 6, rowspan= 100, pady = 10, padx = 10)
-btnGenerar = tk.Button(root, text = 'Generar', command = main)
-btnGenerar.grid(row = 0, column = 8)
-btnBgColor = tk.Button(root, text = 'Color de fondo', command = fondo)
-btnBgColor.grid(row = 1, column = 8)
-btnBgColor = tk.Button(root, text = 'Color de dibujo', command = lapiz)
-btnBgColor.grid(row = 2, column = 8)
+# Ventana principal
+root = Tk()
+root.geometry('577x663')
+root.configure(background = '#44475a')
+root.resizable(width=False, height=False)
+root.title("Tree-Generator")
 
-lblIteraciones = tk.Label(root, text = "Iteraciones")
-lblIteraciones.grid(row = 0, column = 9)
-numIteraciones = tk.Scale(root, from_=0, to=7, orient=HORIZONTAL)
-numIteraciones.grid(row = 1, column= 9)
-numIteraciones.set(3)
+#Canvas dibujo
+canvas = Canvas(root, width = 400, height = 650)
+canvas.grid(row = 0, columnspan = 6, rowspan= 100, pady = 5, padx = 5)
 
-lbldist = tk.Label(root, text = "Distancia")
-lbldist.grid(row = 2, column = 9)
+# Botones Generar L-System, y cambio de color
+btnGenerar = Boton(1, 8, root, text = 'Generar', command = generate)
+btnBgColor = Boton(2, 8, root, text = 'Color de fondo', command = cambiarColorFondo)
+btnFgColor = Boton(3, 8, root, text = 'Color de dibujo', command = cambiarColorTortuga)
 
-dist = tk.Scale(root, from_=1, to=10, orient=HORIZONTAL)
-dist.grid(row = 3, column= 9)
-dist.set(5)
+# Parametros del arbol
+escIteraciones = Escaladora(4, 8,  5, root, from_=  0, to =  7, label = "Iteraciones")
+escDistancia   = Escaladora(5, 8,  5, root, from_=  1, to = 10, label = "Distancia")
+escGrosor      = Escaladora(6, 8,  1, root, from_=  1, to =  3, label = "Grosor")
+escAngulo      = Escaladora(7, 8, 25, root, from_=-90, to = 90, label = "Ángulo")
 
-lblwidth = tk.Label(root, text = "Grosor")
-lblwidth.grid(row = 4, column = 9)
-
-width = tk.Scale(root, from_=1, to=5, orient=HORIZONTAL)
-width.grid(row = 5, column= 9)
-width.set(1)
-
-lblangle = tk.Label(root, text = "Ángulo")
-lblangle.grid(row = 6, column = 9)
-angle = tk.Scale(root, from_=-90, to=90, orient=HORIZONTAL)
-angle.grid(row = 7, column= 9)
-
+# Ventana de la tortuga
 window = turtle.TurtleScreen(canvas)
 window.bgcolor('black')
+# Tortuga
 turt = turtle.RawTurtle(window)
-turt.color('white')
+turt.color('lightgreen')
+turt.hideturtle()
+
 root.mainloop()
